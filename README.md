@@ -2,7 +2,7 @@
 
 A modern, runtime-agnostic fork of [web-push](https://github.com/web-push-libs/web-push), rewritten in TypeScript.
 
-## Key changes from the original `web-push`
+# Why fork?
 
 - **Runtime-agnostic** — uses Web Crypto API + `fetch` instead of Node.js `crypto` / `https`. Works in Node.js, Deno, Bun, Cloudflare Workers, and any environment with Web Crypto support.
 - **TypeScript / ESM-only** — fully typed, tree-shakeable, no CJS.
