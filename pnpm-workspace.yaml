@@ -21,8 +21,8 @@ catalogs:
     unplugin-unused: ^0.5.7
     vitest: ^4.1.2
   examples:
-    hono: ^4.7.13
     '@cloudflare/workers-types': ^4.20250326.0
+    hono: ^4.7.13
     portless: ^0.7.2
     wrangler: ^4.23.0
 
@@ -31,6 +31,7 @@ enablePrePostScripts: true
 onlyBuiltDependencies:
   - esbuild
   - msw
+  - sharp
   - workerd
 
 shellEmulator: true
