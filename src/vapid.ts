@@ -3,6 +3,31 @@ import { SignJWT, importPKCS8 } from 'jose';
 import { base64UrlToUint8Array, uint8ArrayToBase64Url, validateBase64Url } from './base64url.ts';
 
 const DEFAULT_EXPIRATION_SECONDS = 12 * 60 * 60;
+const RAW_PRIVATE_KEY_LENGTH = 32;
+
+function importPrivateKey(
+	decodedPrivateKey: Uint8Array<ArrayBuffer>,
+	decodedPublicKey: Uint8Array<ArrayBuffer>,
+): Promise<CryptoKey> {
+	if (decodedPrivateKey.length === RAW_PRIVATE_KEY_LENGTH) {
+		const x = uint8ArrayToBase64Url(decodedPublicKey.slice(1, 33));
+		const y = uint8ArrayToBase64Url(decodedPublicKey.slice(33, 65));
+		const d = uint8ArrayToBase64Url(decodedPrivateKey);
+		return crypto.subtle.importKey(
+			'jwk',
+			{ kty: 'EC', crv: 'P-256', x, y, d },
+			{ name: 'ECDSA', namedCurve: 'P-256' },
+			false,
+			['sign'],
+		);
+	}
+
+	const pemBase64 = btoa(String.fromCharCode(...decodedPrivateKey));
+	return importPKCS8(
+		`-----BEGIN PRIVATE KEY-----\n${pemBase64}\n-----END PRIVATE KEY-----`,
+		'ES256',
+	);
+}
 
 export async function generateVAPIDKeys(): Promise<{
 	publicKey: string;
@@ -78,11 +103,7 @@ export async function createVapidAuthHeader(
 	const audience = `${url.protocol}//${url.host}`;
 
 	const decodedPrivateKey = base64UrlToUint8Array(privateKey);
-	const pemBase64 = btoa(String.fromCharCode(...decodedPrivateKey));
-	const key = await importPKCS8(
-		`-----BEGIN PRIVATE KEY-----\n${pemBase64}\n-----END PRIVATE KEY-----`,
-		'ES256',
-	);
+	const key = await importPrivateKey(decodedPrivateKey, base64UrlToUint8Array(publicKey));
 
 	const exp = expiration ?? Math.floor(Date.now() / 1000) + DEFAULT_EXPIRATION_SECONDS;
 

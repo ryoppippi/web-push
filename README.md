@@ -1,91 +1,222 @@
-# modern-web-push
+<h1 align="center">modern-web-push</h1>
 
-Runtime-agnostic Web Push library using the Web Crypto API.
+# Why
 
-Works in **Node.js**, **Deno**, **Bun**, **Cloudflare Workers**, and any environment with Web Crypto API + `fetch`.
+Web push requires that push messages triggered from a backend be done via the
+[Web Push Protocol](https://tools.ietf.org/html/draft-ietf-webpush-protocol)
+and if you want to send data with your push message, you must also encrypt
+that data according to the [Message Encryption for Web Push spec](https://tools.ietf.org/html/draft-ietf-webpush-encryption).
 
-## Install
+This module makes it easy to send messages using the **Web Crypto API** and
+**fetch**, so it works in Node.js, Deno, Bun, Cloudflare Workers, and any
+runtime with Web Crypto support.
 
-```bash
-pnpm add modern-web-push
-```
+# Install
 
-## Usage
+    pnpm add modern-web-push
 
-```ts
+# Usage
+
+```typescript
 import { generateVAPIDKeys, sendNotification } from 'modern-web-push';
 
-// Generate VAPID keys (one-time)
+// VAPID keys should be generated only once.
 const vapidKeys = await generateVAPIDKeys();
-console.log(vapidKeys.publicKey);  // base64url-encoded public key
-console.log(vapidKeys.privateKey); // base64url-encoded private key (PKCS8)
 
-// Send a push notification
-const result = await sendNotification(
-  {
-    endpoint: subscription.endpoint,
-    keys: {
-      p256dh: subscription.keys.p256dh,
-      auth: subscription.keys.auth,
-    },
-  },
-  JSON.stringify({ title: 'Hello', body: 'World' }),
-  {
-    vapidDetails: {
-      subject: 'mailto:admin@example.com',
-      publicKey: vapidKeys.publicKey,
-      privateKey: vapidKeys.privateKey,
-    },
-  },
-);
+// This is the same output of calling JSON.stringify on a PushSubscription
+const pushSubscription = {
+	endpoint: '.....',
+	keys: {
+		auth: '.....',
+		p256dh: '.....',
+	},
+};
+
+await sendNotification(pushSubscription, 'Your Push Payload Text', {
+	vapidDetails: {
+		subject: 'mailto:example@yourdomain.org',
+		publicKey: vapidKeys.publicKey,
+		privateKey: vapidKeys.privateKey,
+	},
+});
 ```
 
-## API
+## Using VAPID Key for applicationServerKey
 
-### `generateVAPIDKeys(): Promise<{ publicKey: string; privateKey: string }>`
+When subscribing to push messages, you'll need to pass your VAPID key,
+which you can do like so:
 
-Generates an ECDSA P-256 key pair for VAPID authentication. Returns base64url-encoded keys.
-
-### `sendNotification(subscription, payload?, options?): Promise<SendResult>`
-
-Encrypts the payload (RFC 8291) and sends it to the push service via `fetch`.
-
-### `generateRequestDetails(subscription, payload?, options?): Promise<RequestDetails>`
-
-Generates the HTTP request details without sending. Useful for custom fetch implementations.
-
-### Options
-
-```ts
-interface SendNotificationOptions {
-  vapidDetails: {
-    subject: string;    // https: URL or mailto: address
-    publicKey: string;  // base64url VAPID public key
-    privateKey: string; // base64url VAPID private key (PKCS8)
-  };
-  TTL?: number;          // Time-to-live in seconds (default: 2419200 = 4 weeks)
-  urgency?: 'very-low' | 'low' | 'normal' | 'high';
-  topic?: string;        // Max 32 chars, base64url characters only
-  headers?: Record<string, string>;
-  signal?: AbortSignal;
-}
+```typescript
+registration.pushManager.subscribe({
+	userVisibleOnly: true,
+	applicationServerKey: '<Your Public Key from generateVAPIDKeys()>',
+});
 ```
 
-## Differences from `web-push`
+# API Reference
 
-| Feature | `web-push` | `modern-web-push` |
-|---------|-----------|-------------------|
-| Runtime | Node.js only | Any (Web Crypto + fetch) |
-| Language | JavaScript | TypeScript |
-| Module | CJS | ESM-only |
-| API style | Global mutable state | Stateless async functions |
-| Encryption | Node.js crypto + http_ece | Web Crypto API |
-| HTTP | Node.js https | fetch |
-| GCM support | Yes | No (deprecated 2019) |
-| aesgcm encoding | Yes | No (aes128gcm only) |
-| Proxy support | Yes (https-proxy-agent) | No (use custom fetch) |
-| Dependencies | 5 | 1 (jose) |
+## sendNotification(pushSubscription, payload, options)
 
-## Licence
+```typescript
+import { sendNotification } from 'modern-web-push';
+
+const pushSubscription = {
+	endpoint: '< Push Subscription URL >',
+	keys: {
+		p256dh: '< User Public Encryption Key >',
+		auth: '< User Auth Secret >',
+	},
+};
+
+const payload = '< Push Payload String >';
+
+const options = {
+	vapidDetails: {
+		subject: "< 'mailto' Address or URL >",
+		publicKey: '< URL Safe Base64 Encoded Public Key >',
+		privateKey: '< URL Safe Base64 Encoded Private Key >',
+	},
+	TTL: 60,
+	headers: {
+		'< header name >': '< header value >',
+	},
+	urgency: 'normal',
+	topic: '< Use a maximum of 32 characters from the URL or filename-safe Base64 characters sets. >',
+	signal: AbortSignal.timeout(5000),
+};
+
+const result = await sendNotification(pushSubscription, payload, options);
+```
+
+> **Note:** `sendNotification()` does not require a payload. You can also
+> omit `vapidDetails` if the push service supports unauthenticated requests.
+
+### Input
+
+**Push Subscription**
+
+The first argument must be an object containing the details for a push
+subscription.
+
+The expected format is the same output as JSON.stringify'ing a PushSubscription
+in the browser.
+
+**Payload**
+
+The payload is optional, but if set, will be the data sent with a push
+message.
+
+This must be either a _string_ or a _Uint8Array_.
+
+> **Note:** In order to encrypt the _payload_, the _pushSubscription_ **must**
+> have a _keys_ object with _p256dh_ and _auth_ values.
+
+**Options**
+
+Options is an optional argument that if defined should be an object containing
+any of the following values defined, although none of them are required.
+
+- **vapidDetails** should be an object with _subject_, _publicKey_ and
+  _privateKey_ values defined. These values should follow the [VAPID Spec](https://tools.ietf.org/html/draft-thomson-webpush-vapid). Both PKCS8 and raw 32-byte private keys are supported.
+- **TTL** is a value in seconds that describes how long a push message is
+  retained by the push service (by default, four weeks).
+- **headers** is an object with all the extra headers you want to add to the request.
+- **urgency** is to indicate to the push service whether to send the notification immediately or prioritise the recipient's device power considerations for delivery. Provide one of the following values: very-low, low, normal, or high. To attempt to deliver the notification immediately, specify high.
+- **topic** optionally provide an identifier that the push service uses to coalesce notifications. Use a maximum of 32 characters from the URL or filename-safe Base64 characters sets.
+- **signal** an optional `AbortSignal` to cancel the request.
+
+### Returns
+
+A promise that resolves if the notification was sent successfully
+with details of the request, otherwise it rejects.
+
+In both cases, resolving or rejecting, you'll be able to access the following
+values on the returned object or error.
+
+- _statusCode_, the status code of the response from the push service;
+- _headers_, the headers of the response from the push service;
+- _body_, the body of the response from the push service.
+
+<hr />
+
+## generateVAPIDKeys()
+
+```typescript
+import { generateVAPIDKeys } from 'modern-web-push';
+
+const vapidKeys = await generateVAPIDKeys();
+
+// Prints 2 URL Safe Base64 Encoded Strings
+console.log(vapidKeys.publicKey, vapidKeys.privateKey);
+```
+
+### Input
+
+None.
+
+### Returns
+
+Returns a promise that resolves to an object with **publicKey** and **privateKey** values which are
+URL Safe Base64 encoded strings. The private key is in PKCS8 format.
+
+> **Note:** You should create these keys once, store them and use them for all
+> future messages you send.
+
+<hr />
+
+## generateRequestDetails(pushSubscription, payload, options)
+
+```typescript
+import { generateRequestDetails } from 'modern-web-push';
+
+const details = await generateRequestDetails(pushSubscription, payload, options);
+// details contains: endpoint, method, headers, body
+```
+
+> **Note:** When calling `generateRequestDetails()` the payload argument
+> does not _need_ to be defined, passing in null will return no body and
+> exclude any unnecessary headers.
+
+### Input
+
+Same as `sendNotification()`.
+
+### Returns
+
+A promise that resolves to an object containing all the details needed to make a network request:
+
+- _endpoint_, the URL to send the request to;
+- _method_, this will be 'POST';
+- _headers_, the headers to add to the request;
+- _body_, the body of the request (as a Uint8Array, or null).
+
+<hr />
+
+# Differences from `web-push`
+
+| Feature         | `web-push`                | `modern-web-push`         |
+| --------------- | ------------------------- | ------------------------- |
+| Runtime         | Node.js only              | Any (Web Crypto + fetch)  |
+| Language        | JavaScript                | TypeScript                |
+| Module          | CJS                       | ESM-only                  |
+| API style       | Global mutable state      | Stateless async functions |
+| Encryption      | Node.js crypto + http_ece | Web Crypto API            |
+| HTTP            | Node.js https             | fetch                     |
+| GCM support     | Yes                       | No (deprecated 2019)      |
+| aesgcm encoding | Yes                       | No (aes128gcm only)       |
+| Proxy support   | Yes (https-proxy-agent)   | No (use custom fetch)     |
+| Dependencies    | 5                         | 1 (jose)                  |
+
+# Browser Support
+
+All modern browsers that support the Push API work with this library.
+The library itself runs on any server-side JavaScript runtime with
+Web Crypto API and fetch support.
+
+# Running tests
+
+    pnpm test
+
+# Licence
 
 [MPL-2.0](./LICENSE)

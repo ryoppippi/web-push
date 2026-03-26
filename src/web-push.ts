@@ -29,7 +29,7 @@ export interface SendNotificationOptions {
 	headers?: Record<string, string>;
 	urgency?: UrgencyType;
 	topic?: string;
-	vapidDetails: VapidDetails;
+	vapidDetails?: VapidDetails;
 	signal?: AbortSignal;
 }
 

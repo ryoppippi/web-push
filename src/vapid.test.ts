@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { base64UrlToUint8Array } from './base64url.ts';
+import { base64UrlToUint8Array, uint8ArrayToBase64Url } from './base64url.ts';
 import {
 	createVapidAuthHeader,
 	generateVAPIDKeys,
@@ -59,12 +59,29 @@ describe('validatePrivateKey', () => {
 });
 
 describe('createVapidAuthHeader', () => {
-	it('returns a valid vapid authorization header', async () => {
+	it('returns a valid vapid authorization header with PKCS8 key', async () => {
 		const keys = await generateVAPIDKeys();
 		const header = await createVapidAuthHeader(
 			'https://fcm.googleapis.com/fcm/send/test',
 			keys.publicKey,
 			keys.privateKey,
+			'mailto:test@example.com',
+		);
+		expect(header).toMatch(/^vapid t=[\w-]+\.[\w-]+\.[\w-]+,k=[\w-]+$/);
+	});
+
+	it('works with legacy 32-byte raw private keys', async () => {
+		const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+			'sign',
+		]);
+		const publicKeyRaw = new Uint8Array(await crypto.subtle.exportKey('raw', keyPair.publicKey));
+		const jwk = await crypto.subtle.exportKey('jwk', keyPair.privateKey);
+		const rawPrivateKey = base64UrlToUint8Array(jwk.d!);
+
+		const header = await createVapidAuthHeader(
+			'https://fcm.googleapis.com/fcm/send/test',
+			uint8ArrayToBase64Url(publicKeyRaw),
+			uint8ArrayToBase64Url(rawPrivateKey),
 			'mailto:test@example.com',
 		);
 		expect(header).toMatch(/^vapid t=[\w-]+\.[\w-]+\.[\w-]+,k=[\w-]+$/);

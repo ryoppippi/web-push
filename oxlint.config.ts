@@ -35,7 +35,6 @@ export default defineConfig({
 		eqeqeq: ['error', 'always', { null: 'ignore' }],
 		'max-lines-per-function': ['error', { max: 100 }],
 
-
 		'typescript/no-unused-vars': [
 			'error',
 			{
