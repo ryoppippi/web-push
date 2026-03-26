@@ -1,4 +1,3 @@
-coverage/
 node_modules/
-test/output/
-.nyc_output/
+dist/
+.direnv/

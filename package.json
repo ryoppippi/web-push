@@ -1,55 +1,52 @@
 {
-  "name": "web-push",
-  "version": "3.6.7",
-  "description": "Web Push library for Node.js",
-  "main": "src/index.js",
-  "bin": {
-    "web-push": "src/cli.js"
-  },
-  "scripts": {
-    "download-browser": "node --harmony ./test/helpers/download-test-browsers.js",
-    "lint": "node ./node_modules/eslint/bin/eslint --ignore-path .gitignore '.'",
-    "pretest": "npm run lint && npm run download-browser",
-    "test": "nyc --reporter=lcov --reporter=text mocha -- --ui tdd test/test*"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/web-push-libs/web-push.git"
-  },
-  "keywords": [
-    "web push",
-    "push",
-    "notifications",
-    "push notifications"
-  ],
-  "author": "Marco Castelluccio",
-  "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/web-push-libs/web-push/issues"
-  },
-  "homepage": "https://github.com/web-push-libs/web-push#readme",
-  "dependencies": {
-    "asn1.js": "^5.3.0",
-    "http_ece": "1.2.0",
-    "https-proxy-agent": "^7.0.0",
-    "jws": "^4.0.0",
-    "minimist": "^1.2.5"
-  },
-  "devDependencies": {
-    "chromedriver": "123.0.3",
-    "del": "6.0.0",
-    "eslint": "8.56.0",
-    "eslint-config-airbnb": "19.0.4",
-    "eslint-plugin-import": "2.29.1",
-    "geckodriver": "4.3.0",
-    "nyc": "15.1.0",
-    "mkdirp": "3.0.1",
-    "mocha": "10.4.0",
-    "portfinder": "1.0.32",
-    "selenium-assistant": "5.4.0",
-    "sinon": "17.0.1"
-  },
-  "engines": {
-    "node": ">= 16"
-  }
+	"name": "modern-web-push",
+	"version": "0.0.0",
+	"description": "Runtime-agnostic Web Push library using Web Crypto API",
+	"license": "MPL-2.0",
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"publishConfig": {
+		"exports": {
+			".": {
+				"types": "./dist/index.d.mts",
+				"import": "./dist/index.mjs"
+			}
+		}
+	},
+	"scripts": {
+		"build": "tsdown",
+		"test": "vitest",
+		"lint": "oxlint --max-warnings=0",
+		"format": "oxfmt --write .",
+		"format:check": "oxfmt --check .",
+		"typecheck": "oxlint --max-warnings=0"
+	},
+	"dependencies": {
+		"jose": "^6.2.2"
+	},
+	"devDependencies": {
+		"@typescript/native-preview": "^7.0.0-dev.20260326.1",
+		"msw": "^2.12.14",
+		"oxfmt": "^0.42.0",
+		"oxlint": "^1.57.0",
+		"oxlint-tsgolint": "^0.17.4",
+		"publint": "^0.3.18",
+		"tsdown": "^0.21.5",
+		"vitest": "^4.1.2"
+	},
+	"devEngines": {
+		"runtime": [
+			{
+				"name": "node",
+				"version": ">=22",
+				"onFail": "download"
+			}
+		]
+	},
+	"packageManager": "pnpm@10.29.2"
 }
