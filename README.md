@@ -46,20 +46,20 @@ import {
 // VAPID keys should be generated only once.
 const vapidKeys = await generateVAPIDKeys();
 
-const vapidDetails: VapidDetails = {
+const vapidDetails = {
 	subject: 'mailto:example@yourdomain.org',
 	publicKey: vapidKeys.publicKey,
 	privateKey: vapidKeys.privateKey,
-};
+} satisfies VapidDetails;
 
 // This is the same output of calling JSON.stringify on a PushSubscription
-const pushSubscription: PushSubscription = {
+const pushSubscription = {
 	endpoint: '.....',
 	keys: {
 		auth: '.....',
 		p256dh: '.....',
 	},
-};
+} satisfies PushSubscription;
 
 await sendNotification(pushSubscription, 'Your Push Payload Text', {
 	vapidDetails,
@@ -90,17 +90,17 @@ import {
 	type SendResult,
 } from 'web-push-neo';
 
-const pushSubscription: PushSubscription = {
+const pushSubscription = {
 	endpoint: '< Push Subscription URL >',
 	keys: {
 		p256dh: '< User Public Encryption Key >',
 		auth: '< User Auth Secret >',
 	},
-};
+} satisfies PushSubscription;
 
 const payload = '< Push Payload String >';
 
-const options: SendNotificationOptions = {
+const options = {
 	vapidDetails: {
 		subject: "< 'mailto' Address or URL >",
 		publicKey: '< URL Safe Base64 Encoded Public Key >',
@@ -113,7 +113,7 @@ const options: SendNotificationOptions = {
 	urgency: 'normal',
 	topic: '< Use a maximum of 32 characters from the URL or filename-safe Base64 characters sets. >',
 	signal: AbortSignal.timeout(5000),
-};
+} satisfies SendNotificationOptions;
 
 const result: SendResult = await sendNotification(pushSubscription, payload, options);
 ```
