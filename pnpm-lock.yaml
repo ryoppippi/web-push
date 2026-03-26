@@ -53,9 +53,6 @@ catalogs:
     hono:
       specifier: ^4.7.13
       version: 4.12.9
-    portless:
-      specifier: ^0.7.2
-      version: 0.7.2
     wrangler:
       specifier: ^4.23.0
       version: 4.77.0
@@ -120,9 +117,6 @@ importers:
       '@cloudflare/workers-types':
         specifier: catalog:examples
         version: 4.20260317.1
-      portless:
-        specifier: catalog:examples
-        version: 0.7.2
       wrangler:
         specifier: catalog:examples
         version: 4.77.0(@cloudflare/workers-types@4.20260317.1)
@@ -1513,10 +1507,6 @@ packages:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
     engines: {node: '>=18'}
 
-  chalk@5.6.2:
-    resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
-    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-
   changelogen@0.5.7:
     resolution: {integrity: sha512-cTZXBcJMl3pudE40WENOakXkcVtrbBpbkmSkM20NdRiUqa4+VYRdXdEsgQ0BNQ6JBE2YymTNWtPKVF7UCTN5+g==}
     hasBin: true
@@ -2172,12 +2162,6 @@ packages:
 
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
-
-  portless@0.7.2:
-    resolution: {integrity: sha512-bwtBBTqCe4K2FL3MMTCMFw3ZEBsv5lJeu9VgVdDqFPhb04jgAaWu3ibXP/dZ6y7OfqV/Vphj0e7Z6bQxcr8uFg==}
-    engines: {node: '>=20'}
-    os: [darwin, linux, win32]
-    hasBin: true
 
   postcss@8.5.8:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
@@ -3530,8 +3514,6 @@ snapshots:
 
   chai@6.2.2: {}
 
-  chalk@5.6.2: {}
-
   changelogen@0.5.7:
     dependencies:
       c12: 1.11.2
@@ -4172,10 +4154,6 @@ snapshots:
       confbox: 0.2.4
       exsolve: 1.0.8
       pathe: 2.0.3
-
-  portless@0.7.2:
-    dependencies:
-      chalk: 5.6.2
 
   postcss@8.5.8:
     dependencies:

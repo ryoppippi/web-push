@@ -3,6 +3,7 @@ import { generateVAPIDKeys, sendNotification } from 'web-push-neo';
 import type { PushSubscription, VapidDetails } from 'web-push-neo';
 
 interface Env {
+	ASSETS: Fetcher;
 	VAPID_PUBLIC_KEY?: string;
 	VAPID_PRIVATE_KEY?: string;
 	VAPID_SUBJECT?: string;
@@ -52,5 +53,7 @@ app.get('/api/generate-keys', async (_c) => {
 	const keys = await generateVAPIDKeys();
 	return _c.json(keys);
 });
+
+app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw));
 
 export default app;

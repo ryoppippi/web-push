@@ -4,7 +4,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "portless -- wrangler dev",
+		"dev": "wrangler dev",
 		"deploy": "wrangler deploy"
 	},
 	"dependencies": {
@@ -13,7 +13,6 @@
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "catalog:examples",
-		"portless": "catalog:examples",
 		"wrangler": "catalog:examples"
 	}
 }
