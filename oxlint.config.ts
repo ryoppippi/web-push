@@ -33,7 +33,7 @@ export default defineConfig({
 		],
 		complexity: ['error', { max: 30 }],
 		eqeqeq: ['error', 'always', { null: 'ignore' }],
-		'max-lines-per-function': 'off',
+		'max-lines-per-function': ['error', { max: 100 }],
 		'no-negated-condition': 'off',
 
 		'typescript/no-unused-vars': [
@@ -67,7 +67,6 @@ export default defineConfig({
 			},
 		],
 		'typescript/no-extraneous-class': 'error',
-		'typescript/no-confusing-void-expression': 'off',
 		'typescript/ban-ts-comment': [
 			'error',
 			{
@@ -88,7 +87,6 @@ export default defineConfig({
 		'unicorn/prefer-top-level-await': 'off',
 		'unicorn/prefer-code-point': 'off',
 		'unicorn/prefer-string-replace-all': 'error',
-		'unicorn/consistent-function-scoping': 'off',
 
 		curly: ['error', 'all'],
 	},
@@ -99,6 +97,8 @@ export default defineConfig({
 				'no-console': 'off',
 				'typescript/no-explicit-any': 'warn',
 				'typescript/no-floating-promises': 'warn',
+				'typescript/no-confusing-void-expression': 'off',
+				'unicorn/consistent-function-scoping': 'off',
 			},
 		},
 	],
