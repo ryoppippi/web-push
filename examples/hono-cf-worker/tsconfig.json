@@ -11,7 +11,9 @@
 		"noEmit": true,
 		"allowImportingTsExtensions": true,
 		"skipLibCheck": true,
-		"types": ["@cloudflare/workers-types"]
+		"types": ["@cloudflare/workers-types"],
+		"jsx": "react-jsx",
+		"jsxImportSource": "hono/jsx"
 	},
 	"include": ["src"]
 }

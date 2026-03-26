@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import { generateVAPIDKeys, sendNotification } from 'web-push-neo';
 import type { PushSubscription, VapidDetails } from 'web-push-neo';
 
+import { Page } from './page.tsx';
+
 interface Env {
 	ASSETS: Fetcher;
 	VAPID_PUBLIC_KEY?: string;
@@ -22,6 +24,8 @@ async function getVapidKeys(env: Env): Promise<{ publicKey: string; privateKey: 
 	cachedVapidKeys ??= await generateVAPIDKeys();
 	return cachedVapidKeys;
 }
+
+app.get('/', (c) => c.html(<Page />));
 
 app.get('/api/vapid-public-key', async (c) => {
 	const keys = await getVapidKeys(c.env);

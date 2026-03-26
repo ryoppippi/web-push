@@ -1,6 +1,6 @@
 {
 	"name": "web-push-neo-example",
-	"main": "src/index.ts",
+	"main": "src/index.tsx",
 	"compatibility_date": "2025-03-26",
 	"assets": {
 		"directory": "public",
