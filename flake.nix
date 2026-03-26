@@ -17,6 +17,8 @@
             jq
             git
             gh
+            lefthook
+            nixfmt-rfc-style
           ];
 
           shellHook = ''
@@ -24,6 +26,8 @@
               echo "Installing dependencies..."
               pnpm install --frozen-lockfile
             fi
+
+            lefthook install > /dev/null 2>&1
           '';
         };
       });

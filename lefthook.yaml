@@ -1,0 +1,30 @@
+pre-commit:
+  piped: true
+  jobs:
+    - name: oxlint
+      glob: '*.{ts,mts}'
+      run: pnpm oxlint --fix {staged_files}
+      stage_fixed: true
+    - name: oxfmt
+      glob: '*'
+      run: pnpm oxfmt --no-error-on-unmatched-pattern {staged_files}
+      stage_fixed: true
+    - name: nixfmt
+      glob: '*.nix'
+      run: nix develop --command nixfmt {staged_files}
+      stage_fixed: true
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: knip
+      run: pnpm run lint:knip
+    - name: lockfile-sync-check
+      glob: '{**/package.json,pnpm-workspace.yaml}'
+      run: pnpm install --lockfile-only --frozen-lockfile
+    - name: lint-all-on-lockfile-change
+      glob: 'pnpm-lock.yaml'
+      run: pnpm lint
+    - name: test-all-on-lockfile-change
+      glob: 'pnpm-lock.yaml'
+      run: pnpm test
