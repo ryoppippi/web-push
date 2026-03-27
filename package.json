@@ -1,6 +1,6 @@
 {
 	"name": "web-push-neo",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Runtime-agnostic Web Push library using Web Crypto API",
 	"homepage": "https://github.com/ryoppippi/web-push-neo#readme",
 	"bugs": "https://github.com/ryoppippi/web-push-neo/issues",
