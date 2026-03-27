@@ -7,8 +7,8 @@ export default defineConfig({
 	clean: true,
 	dts: true,
 	sourcemap: true,
-	publint: true,
-	unused: true,
 	unbundle: true,
 	nodeProtocol: true,
+	publint: true,
+	unused: true,
 });
